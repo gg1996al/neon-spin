@@ -198,7 +198,14 @@
     function checkWin(res) {
         if (res[0] === res[1] && res[1] === res[2]) {
             const win = 500;
-            balance += win;
+           // Загружаем баланс из памяти или ставим 1000, если игрок зашел впервые
+    let balance = parseInt(localStorage.getItem('slotBalance')) || 5000; 
+    document.getElementById('balance').innerText = balance;
+
+    // Функция для сохранения баланса (вызывай её после каждого спина и выигрыша)
+    function saveBalance() {
+        localStorage.setItem('slotBalance', balance);
+    }
             document.getElementById('balance').innerText = balance;
             document.getElementById('win-display').innerText = `ВЫИГРЫШ: ${win}!`;
             
