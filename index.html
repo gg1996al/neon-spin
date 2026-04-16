@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>NEON SPIN</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>NEON<span class="glow">SPIN</span></h1>
+            <div id="level">Уровень 1 • Cyber Rookie</div>
+        </div>
+
+        <div id="user-info"></div>
+
+        <div class="display-frame">
+            <div class="reels" id="reels">
+                <div class="reel"><div class="reel-inner" id="reel1"></div></div>
+                <div class="reel"><div class="reel-inner" id="reel2"></div></div>
+                <div class="reel"><div class="reel-inner" id="reel3"></div></div>
+            </div>
+        </div>
+
+        <div class="stats">
+            <div>Монеты: <span id="balance" class="neon-text">2500</span></div>
+            <div>Комбо: <span id="combo">0</span>x</div>
+        </div>
+
+        <div id="win-message"></div>
+
+        <div class="actions">
+            <button id="spin-btn" class="main-btn">SPIN (100)</button>
+            <button id="reward-btn" class="reward-btn">БЕСПЛАТНЫЙ СПИН<br><small>Смотреть рекламу</small></button>
+        </div>
+
+        <button id="buy-btn" class="stars-btn">Купить Stars</button>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
