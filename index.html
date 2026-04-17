@@ -3,304 +3,141 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Neon Spin Pro</title>
+    <title>Neon Spin Fix</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
-    
     <style>
-        :root {
-            --neon-yellow: #ffd700;
-            --neon-pink: #ff00ff;
-            --bg-color: #0d0d1a;
-        }
-
-        body {
-            margin: 0;
-            padding: 0;
-            height: 100vh;
-            background: var(--bg-color);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-family: 'Press Start 2P', cursive;
-            color: #fff;
-            overflow: hidden;
-            touch-action: none;
-        }
-
-        .game-container {
-            width: 90vw;
-            max-width: 400px;
-            background: linear-gradient(180deg, #1a1a2e 0%, #0f0f1a 100%);
-            border: 6px solid var(--neon-yellow);
-            border-radius: 24px;
-            padding: 20px;
-            box-shadow: 0 0 20px rgba(255, 0, 255, 0.3), inset 0 0 15px rgba(0,0,0,0.8);
-            text-align: center;
-        }
-
-        .header {
-            font-size: 12px;
-            color: var(--neon-yellow);
-            margin-bottom: 20px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        /* Слот-машина */
-        .reels-frame {
-            display: flex;
-            justify-content: space-between;
-            background: #000;
-            padding: 10px;
-            border-radius: 12px;
-            gap: 8px;
-            border: 3px solid #333;
-        }
-
-        .reel {
-            flex: 1;
-            height: 120px;
-            background: #111;
-            border-radius: 8px;
-            overflow: hidden;
-            position: relative;
-        }
-
-        .reel-inner {
-            position: absolute;
-            width: 100%;
-            top: 0;
-        }
-
-        .symbol {
-            height: 60px;
-            line-height: 60px;
-            font-size: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        /* Инфо-панель */
-        .stats {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 20px;
-            font-size: 10px;
-            color: #0f0;
-        }
-
-        #status-text {
-            height: 40px;
-            margin-top: 15px;
-            font-size: 12px;
-            color: var(--neon-pink);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        /* Кнопка */
-        .spin-button {
-            width: 100%;
-            padding: 18px;
-            background: linear-gradient(180deg, #ff0044 0%, #990022 100%);
-            border: none;
-            border-radius: 12px;
-            color: white;
-            font-family: 'Press Start 2P', cursive;
-            font-size: 20px;
-            cursor: pointer;
-            box-shadow: 0 6px 0 #660011;
-            transition: all 0.1s;
-        }
-
-        .spin-button:active {
-            transform: translateY(4px);
-            box-shadow: 0 2px 0 #660011;
-        }
-
-        .spin-button:disabled {
-            filter: grayscale(1);
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: 0 4px 0 #333;
-        }
+        body { margin: 0; background: #0a0a12; color: #fff; font-family: 'Press Start 2P', cursive; display: flex; justify-content: center; align-items: center; height: 100vh; overflow: hidden; }
+        .game-container { width: 90vw; max-width: 380px; background: #16162d; border: 5px solid #ffd700; border-radius: 20px; padding: 20px; text-align: center; box-shadow: 0 0 20px rgba(255, 215, 0, 0.2); }
+        .reels-frame { display: flex; justify-content: space-around; background: #000; padding: 15px; border-radius: 12px; margin: 20px 0; border: 2px solid #333; }
+        .reel { width: 80px; height: 80px; background: #111; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 40px; border: 1px solid #222; }
+        .stats { display: flex; justify-content: space-between; font-size: 10px; color: #0f0; margin-bottom: 10px; }
+        .spin-button { width: 100%; padding: 20px; background: #ff0044; border: none; border-radius: 15px; color: white; font-family: 'Press Start 2P', cursive; font-size: 20px; cursor: pointer; box-shadow: 0 5px 0 #440000; }
+        .spin-button:active { transform: translateY(3px); box-shadow: 0 2px 0 #440000; }
+        .spin-button:disabled { opacity: 0.5; cursor: not-allowed; }
+        #status { height: 40px; line-height: 40px; color: #ff00ff; font-size: 12px; margin-bottom: 10px; }
     </style>
 </head>
 <body>
 
 <div class="game-container">
-    <div class="header" id="user-display">NEON SPIN</div>
-    
+    <div id="user-display" style="font-size: 10px; color: #ffd700; margin-bottom: 15px;">NEON SLOTS</div>
     <div class="reels-frame">
-        <div class="reel"><div class="reel-inner" id="reel1"></div></div>
-        <div class="reel"><div class="reel-inner" id="reel2"></div></div>
-        <div class="reel"><div class="reel-inner" id="reel3"></div></div>
+        <div id="slot1" class="reel">🍒</div>
+        <div id="slot2" class="reel">🍉</div>
+        <div id="slot3" class="reel">🍋</div>
     </div>
-
     <div class="stats">
-        <div>БАЛАНС:<br><span id="balance">0</span></div>
-        <div>СТАВКА:<br>100</div>
+        <div>CASH: <span id="balance">5000</span></div>
+        <div>BET: 100</div>
     </div>
-
-    <div id="status-text">ЖМИ SPIN!</div>
-
+    <div id="status">READY TO SPIN</div>
     <button class="spin-button" id="spin-btn">SPIN</button>
 </div>
 
 <script>
-    // --- 1. CONFIGURATION ---
-    const CONFIG = {
-        bet: 100,
-        symbols: [
-            { char: '🍒', weight: 40, prize: 5 },   // Множитель x5
-            { char: '🍉', weight: 25, prize: 10 },  // x10
-            { char: '🍋', weight: 15, prize: 20 },  // x20
-            { char: '⭐', weight: 8,  prize: 50 },  // x50
-            { char: '7️⃣', weight: 4,  prize: 100 }  // x100 (Джекпот)
-        ],
-        reelSpeed: 2000 // Базовая скорость анимации в мс
-    };
-
-    // --- 2. GAME STATE ---
-    let state = {
-        balance: parseInt(localStorage.getItem('user_balance')) || 5000,
-        isSpinning: false
-    };
-
-    // --- 3. UI ELEMENTS ---
+    // Инициализация Telegram
     const tg = window.Telegram.WebApp;
+    tg.expand();
+
+    // Настройки символов
+    const symbols = [
+        { char: '🍒', prize: 5 },
+        { char: '🍉', prize: 10 },
+        { char: '🍋', prize: 20 },
+        { char: '7️⃣', prize: 100 }
+    ];
+
+    // Состояние игры (используем уникальный ключ для баланса v2)
+    let balance = parseInt(localStorage.getItem('slot_balance_v2')) || 5000;
+    let isSpinning = false;
+
     const balanceEl = document.getElementById('balance');
-    const statusEl = document.getElementById('status-text');
     const spinBtn = document.getElementById('spin-btn');
+    const statusEl = document.getElementById('status');
     const userDisplay = document.getElementById('user-display');
 
-    // --- 4. CORE ENGINE ---
-    
-    // Инициализация Telegram
-    tg.expand();
-    if (tg.initDataUnsafe?.user) {
-        userDisplay.innerText = `${tg.initDataUnsafe.user.first_name}'S SLOTS`;
+    // Отображаем имя пользователя
+    if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
+        userDisplay.innerText = tg.initDataUnsafe.user.first_name.toUpperCase() + "'S SLOTS";
     }
 
     function updateUI() {
-        balanceEl.innerText = state.balance;
-        localStorage.setItem('user_balance', state.balance);
+        balanceEl.innerText = balance;
+        localStorage.setItem('slot_balance_v2', balance);
     }
 
-    function getRandomSymbol() {
-        const totalWeight = CONFIG.symbols.reduce((sum, s) => sum + s.weight, 0);
-        let rand = Math.random() * totalWeight;
-        for (const s of CONFIG.symbols) {
-            if (rand < s.weight) return s;
-            rand -= s.weight;
-        }
-    }
-
-    function createReelSymbols(reelElement) {
-        reelElement.innerHTML = '';
-        // Генерируем 30 случайных символов для создания эффекта длинной ленты
-        for (let i = 0; i < 30; i++) {
-            const div = document.createElement('div');
-            div.className = 'symbol';
-            div.innerText = getRandomSymbol().char;
-            reelElement.appendChild(div);
-        }
-    }
-
-    async function handleSpin() {
-        if (state.isSpinning || state.balance < CONFIG.bet) {
-            if (state.balance < CONFIG.bet) tg.showAlert("Недостаточно монет!");
+    function spin() {
+        if (isSpinning || balance < 100) {
+            if (balance < 100) statusEl.innerText = "NO CASH!";
             return;
         }
 
-        // Старт спина
-        state.isSpinning = true;
-        state.balance -= CONFIG.bet;
+        isSpinning = true;
+        balance -= 100;
         updateUI();
         
         spinBtn.disabled = true;
-        statusEl.innerText = "УДАЧИ...";
+        statusEl.innerText = "SPINNING...";
         statusEl.style.color = "#ff0";
 
         if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred('medium');
 
-        // Генерируем результат
-        const finalResults = [getRandomSymbol(), getRandomSymbol(), getRandomSymbol()];
-
-        // Анимация
-        const reels = [
-            document.getElementById('reel1'),
-            document.getElementById('reel2'),
-            document.getElementById('reel3')
-        ];
-
-        const animationPromises = reels.map((reel, index) => {
-            return animateReel(reel, index, finalResults[index]);
-        });
-
-        await Promise.all(animationPromises);
-
-        // Финал
-        processResult(finalResults);
+        let iterations = 0;
+        const maxIterations = 15;
+        
+        const interval = setInterval(() => {
+            document.getElementById('slot1').innerText = symbols[Math.floor(Math.random() * symbols.length)].char;
+            document.getElementById('slot2').innerText = symbols[Math.floor(Math.random() * symbols.length)].char;
+            document.getElementById('slot3').innerText = symbols[Math.floor(Math.random() * symbols.length)].char;
+            
+            iterations++;
+            if (iterations >= maxIterations) {
+                clearInterval(interval);
+                finishSpin();
+            }
+        }, 100);
     }
 
-    function animateReel(reel, index, targetSymbol) {
-        return new Promise(resolve => {
-            // Подставляем финальный символ в конец ленты
-            const lastSymbol = reel.lastElementChild;
-            lastSymbol.innerText = targetSymbol.char;
+    function finishSpin() {
+        // Честный расчет результата
+        const r1 = symbols[Math.floor(Math.random() * symbols.length)];
+        const r2 = symbols[Math.floor(Math.random() * symbols.length)];
+        const r3 = symbols[Math.floor(Math.random() * symbols.length)];
 
-            const duration = CONFIG.reelSpeed + (index * 600);
-            const moveY = reel.scrollHeight - 120; // Сдвигаем почти до конца ленты
+        document.getElementById('slot1').innerText = r1.char;
+        document.getElementById('slot2').innerText = r2.char;
+        document.getElementById('slot3').innerText = r3.char;
 
-            reel.style.transition = `transform ${duration}ms cubic-bezier(0.45, 0.05, 0.55, 0.95)`;
-            reel.style.transform = `translateY(-${moveY}px)`;
-
-            setTimeout(() => {
-                // Мгновенно перекидываем ленту в начало для следующего раза
-                reel.style.transition = 'none';
-                reel.style.transform = 'translateY(0)';
-                // Устанавливаем первый символ как тот, что выпал
-                reel.firstElementChild.innerText = targetSymbol.char;
-                resolve();
-            }, duration + 100);
-        });
-    }
-
-    function processResult(results) {
-        state.isSpinning = false;
-        spinBtn.disabled = false;
-
-        const isWin = results[0].char === results[1].char && results[1].char === results[2].char;
-
-        if (isWin) {
-            const winAmount = CONFIG.bet * results[0].prize;
-            state.balance += winAmount;
-            statusEl.innerText = `ВЫИГРЫШ: ${winAmount}!`;
+        if (r1.char === r2.char && r2.char === r3.char) {
+            const winAmount = 100 * r1.prize;
+            balance += winAmount;
+            statusEl.innerText = "WIN: +" + winAmount;
             statusEl.style.color = "#0f0";
             
-            // Эффекты
-            confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+            confetti({
+                particleCount: 150,
+                spread: 70,
+                origin: { y: 0.6 }
+            });
+            
             if (tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
         } else {
-            statusEl.innerText = "ПОПРОБУЙ ЕЩЕ!";
-            statusEl.style.color = var(--neon-pink);
+            statusEl.innerText = "TRY AGAIN";
+            statusEl.style.color = "#ff00ff";
         }
+
+        isSpinning = false;
+        spinBtn.disabled = false;
         updateUI();
     }
 
-    // --- 5. START ---
-    createReelSymbols(document.getElementById('reel1'));
-    createReelSymbols(document.getElementById('reel2'));
-    createReelSymbols(document.getElementById('reel3'));
+    // Привязываем клик
+    spinBtn.onclick = spin;
+
+    // Первичная отрисовка
     updateUI();
-
-    spinBtn.addEventListener('click', handleSpin);
-
 </script>
 
 </body>
