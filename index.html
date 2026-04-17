@@ -3,186 +3,200 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Neon Spin Ultra v2</title>
-    <script src="https://telegram.org/js/telegram-web-app.js?id=2026"></script>
+    <title>Star Gifts v3</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --gold: #ffd700;
-            --neon: #ff00ff;
-        }
-        body { margin: 0; background: #05050a; color: #fff; font-family: 'Press Start 2P', cursive; display: flex; justify-content: center; align-items: center; height: 100vh; overflow: hidden; }
-        
-        .game-container { 
-            width: 90vw; max-width: 360px; background: #111125; 
-            border: 4px solid var(--gold); border-radius: 20px; 
-            padding: 20px; text-align: center; 
-            box-shadow: 0 0 30px rgba(255, 0, 255, 0.2);
-        }
-
-        /* Окно барабанов */
-        .reels-frame { 
-            display: flex; justify-content: space-around; 
-            background: #000; padding: 10px; border-radius: 12px; 
-            margin: 20px 0; border: 2px solid #333; height: 120px; overflow: hidden;
+        body {
+            margin: 0;
+            background: #0e1621; /* Цвет Telegram Dark */
+            color: white;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
         }
 
-        .reel { 
-            width: 30%; height: 120px; position: relative; 
-            border-right: 1px solid #222; 
+        .app {
+            width: 90%;
+            max-width: 380px;
+            text-align: center;
+            background: rgba(255, 255, 255, 0.03);
+            padding: 25px;
+            border-radius: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
-        .reel-inner { 
-            position: absolute; width: 100%; top: 0; 
-            transition: transform 2s cubic-bezier(0.1, 0, 0.1, 1);
+        .header h1 {
+            font-size: 22px;
+            color: #24A1DE;
+            margin: 0 0 20px 0;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
-        .symbol { 
-            height: 60px; line-height: 60px; font-size: 35px; 
-            display: flex; align-items: center; justify-content: center; 
+        /* Окно слотов */
+        .slots-container {
+            display: flex;
+            justify-content: space-between;
+            background: #000;
+            border: 2px solid #24A1DE;
+            border-radius: 20px;
+            height: 100px;
+            overflow: hidden;
+            margin-bottom: 25px;
+            box-shadow: 0 0 15px rgba(36, 161, 222, 0.2);
         }
 
-        .stats { display: flex; justify-content: space-between; font-size: 9px; color: #0f0; }
-        
-        #status { height: 30px; margin: 10px 0; color: var(--neon); font-size: 11px; }
-
-        .spin-button { 
-            width: 100%; padding: 18px; background: #ff0044; 
-            border: none; border-radius: 12px; color: white; 
-            font-family: 'Press Start 2P', cursive; font-size: 20px; 
-            box-shadow: 0 6px 0 #600; cursor: pointer;
+        .reel {
+            width: 32%;
+            position: relative;
         }
 
-        .spin-button:active { transform: translateY(3px); box-shadow: 0 3px 0 #600; }
-        .spin-button:disabled { opacity: 0.5; filter: grayscale(1); }
+        .reel-inner {
+            position: absolute;
+            width: 100%;
+            transition: transform 3s cubic-bezier(0.15, 0, 0.05, 1);
+        }
+
+        .symbol {
+            height: 100px;
+            line-height: 100px;
+            font-size: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .balance-info {
+            display: flex;
+            justify-content: space-around;
+            background: rgba(0,0,0,0.2);
+            padding: 15px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+        }
+
+        .val { font-size: 20px; font-weight: bold; color: #ffce31; }
+        .label { font-size: 10px; color: #888; display: block; }
+
+        .play-btn {
+            width: 100%;
+            padding: 20px;
+            background: #24A1DE;
+            border: none;
+            border-radius: 20px;
+            color: white;
+            font-size: 20px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(36, 161, 222, 0.3);
+        }
+
+        .play-btn:active { transform: scale(0.97); }
+        .play-btn:disabled { background: #555; }
+
+        #msg { margin-top: 15px; color: #24A1DE; font-weight: bold; min-height: 20px; }
     </style>
 </head>
 <body>
 
-<div class="game-container">
-    <div id="user-display" style="font-size: 10px; color: var(--gold); margin-bottom: 10px;">NEON SLOTS</div>
-    
-    <div class="reels-frame">
-        <div class="reel"><div id="reel1" class="reel-inner"></div></div>
-        <div class="reel"><div id="reel2" class="reel-inner"></div></div>
-        <div class="reel"><div id="reel3" class="reel-inner"></div></div>
+<div class="app">
+    <div class="header">
+        <h1>STAR GIFTS v3</h1>
     </div>
 
-    <div class="stats">
-        <div>BALANCE: <span id="balance">0</span></div>
-        <div>BET: 100</div>
+    <div class="slots-container">
+        <div class="reel"><div id="r1" class="reel-inner"></div></div>
+        <div class="reel"><div id="r2" class="reel-inner"></div></div>
+        <div class="reel"><div id="r3" class="reel-inner"></div></div>
     </div>
-    
-    <div id="status">READY</div>
-    <button class="spin-button" id="spin-btn">SPIN</button>
+
+    <div class="balance-info">
+        <div><span class="label">БАЛАНС</span><span class="val" id="bal">5000</span> ⭐️</div>
+        <div><span class="label">СТАВКА</span><span class="val">10</span> ⭐️</div>
+    </div>
+
+    <button class="play-btn" id="btn">ИГРАТЬ</button>
+    <div id="msg">Удачи!</div>
 </div>
 
 <script>
-    // АНТИ-КЭШ МЕХАНИКА (v2.0.1)
-    const APP_VERSION = "2.0.1";
-    console.log("App Version:", APP_VERSION);
-
     const tg = window.Telegram.WebApp;
     tg.expand();
 
-    const symbols = ['🍒', '🍉', '🍋', '⭐', '7️⃣'];
-    const prizes = { '🍒': 5, '🍉': 10, '🍋': 20, '⭐': 50, '7️⃣': 100 };
+    const gifts = ['💎', '⭐️', '🎁', '🏆', '🦄'];
+    let balance = parseInt(localStorage.getItem('stars_v3')) || 5000;
+    let spinning = false;
 
-    let balance = parseInt(localStorage.getItem('slot_balance_v3')) || 5000;
-    let isSpinning = false;
-
-    const balanceEl = document.getElementById('balance');
-    const spinBtn = document.getElementById('spin-btn');
-    const statusEl = document.getElementById('status');
-
-    function updateUI() {
-        balanceEl.innerText = balance;
-        localStorage.setItem('slot_balance_v3', balance);
-    }
-
-    // Наполнение ленты барабана
-    function initReels() {
-        [1, 2, 3].forEach(id => {
-            const r = document.getElementById('reel' + id);
-            r.innerHTML = '';
-            // Создаем длинную ленту для прокрутки
-            for(let i=0; i<30; i++) {
+    function createReels() {
+        [1,2,3].forEach(id => {
+            const el = document.getElementById('r'+id);
+            el.innerHTML = '';
+            for(let i=0; i<50; i++) {
                 const s = document.createElement('div');
                 s.className = 'symbol';
-                s.innerText = symbols[Math.floor(Math.random() * symbols.length)];
-                r.appendChild(s);
+                s.innerText = gifts[Math.floor(Math.random()*gifts.length)];
+                el.appendChild(s);
             }
         });
     }
 
-    async function spin() {
-        if (isSpinning || balance < 100) return;
+    function update() {
+        document.getElementById('bal').innerText = balance;
+        localStorage.setItem('stars_v3', balance);
+    }
 
-        isSpinning = true;
-        balance -= 100;
-        updateUI();
-        spinBtn.disabled = true;
-        statusEl.innerText = "SPINNING...";
-        statusEl.style.color = "#ff0";
+    async function start() {
+        if(spinning || balance < 10) return;
+        spinning = true;
+        balance -= 10;
+        update();
+        
+        const btn = document.getElementById('btn');
+        btn.disabled = true;
+        document.getElementById('msg').innerText = "Удача близко...";
 
-        if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred('medium');
+        if(tg.HapticFeedback) tg.HapticFeedback.impactOccurred('medium');
 
-        const finalSymbols = [];
-
-        for(let i=1; i<=3; i++) {
-            const r = document.getElementById('reel' + i);
-            const target = Math.floor(Math.random() * (symbols.length));
-            finalSymbols.push(symbols[target]);
+        const final = [];
+        [1,2,3].forEach(id => {
+            const el = document.getElementById('r'+id);
+            const res = gifts[Math.floor(Math.random()*gifts.length)];
+            final.push(res);
+            el.lastElementChild.innerText = res;
             
-            // Устанавливаем "выигрышный" символ в конец ленты перед анимацией
-            r.lastElementChild.innerText = symbols[target];
-            
-            // Запуск анимации (сдвигаем ленту вверх)
-            const scrollDistance = (r.children.length - 2) * 60;
-            r.style.transition = `transform ${2 + i*0.5}s cubic-bezier(0.1, 0, 0.1, 1)`;
-            r.style.transform = `translateY(-${scrollDistance}px)`;
-        }
+            const offset = (el.children.length - 1) * 100;
+            el.style.transition = `transform ${2 + id*0.5}s cubic-bezier(0.1, 0, 0.1, 1)`;
+            el.style.transform = `translateY(-${offset}px)`;
+        });
 
         setTimeout(() => {
-            checkResult(finalSymbols);
+            [1,2,3].forEach((id, i) => {
+                const el = document.getElementById('r'+id);
+                el.style.transition = 'none';
+                el.style.transform = 'translateY(0)';
+                el.firstElementChild.innerText = final[i];
+            });
+
+            if(final[0] === final[1] && final[1] === final[2]) {
+                balance += 500;
+                document.getElementById('msg').innerText = "ВЫИГРЫШ +500!";
+                confetti({ particleCount: 150 });
+            } else {
+                document.getElementById('msg').innerText = "Попробуй еще раз";
+            }
+            spinning = false;
+            btn.disabled = false;
+            update();
         }, 3500);
     }
 
-    function checkResult(res) {
-        // Сбрасываем анимацию для следующего раза
-        [1,2,3].forEach(id => {
-            const r = document.getElementById('reel' + id);
-            r.style.transition = 'none';
-            r.style.transform = 'translateY(0)';
-            r.firstElementChild.innerText = res[id-1];
-        });
-
-        if (res[0] === res[1] && res[1] === res[2]) {
-            const win = 100 * prizes[res[0]];
-            balance += win;
-            statusEl.innerText = "WIN: +" + win;
-            statusEl.style.color = "#0f0";
-            confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
-            if (tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
-        } else {
-            statusEl.innerText = "TRY AGAIN";
-            statusEl.style.color = "#ff00ff";
-        }
-
-        isSpinning = false;
-        spinBtn.disabled = false;
-        updateUI();
-    }
-
-    if (tg.initDataUnsafe?.user) {
-        document.getElementById('user-display').innerText = tg.initDataUnsafe.user.first_name.toUpperCase() + "'S SLOTS";
-    }
-
-    spinBtn.onclick = spin;
-    initReels();
-    updateUI();
+    document.getElementById('btn').onclick = start;
+    createReels();
+    update();
 </script>
-
 </body>
 </html>
