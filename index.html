@@ -3,101 +3,61 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title Star Gifts v3<title
+    <title>Star Gifts v3.1 Pay</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
         body {
-            margin: 0;
-            background: #0e1621; /* Цвет Telegram Dark */
-            color: white;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            overflow: hidden;
+            margin: 0; background: #0e1621; color: white;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            display: flex; justify-content: center; align-items: center; height: 100vh; overflow: hidden;
         }
 
         .app {
-            width: 90%;
-            max-width: 380px;
-            text-align: center;
-            background: rgba(255, 255, 255, 0.03);
-            padding: 25px;
-            border-radius: 30px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            width: 90%; max-width: 380px; text-align: center;
+            background: rgba(255, 255, 255, 0.03); padding: 25px;
+            border-radius: 30px; border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
-        .header h1 {
-            font-size: 22px;
-            color: #24A1DE;
-            margin: 0 0 20px 0;
-            text-transform: uppercase;
-            letter-spacing: 1px;
+        .header h1 { font-size: 20px; color: #24A1DE; margin: 0 0 20px 0; }
+
+        /* Секция баланса с кнопкой ПАЙ */
+        .balance-container {
+            display: flex; justify-content: space-around; align-items: center;
+            background: rgba(0,0,0,0.3); padding: 15px;
+            border-radius: 20px; margin-bottom: 25px; border: 1px solid #24A1DE;
         }
 
-        /* Окно слотов */
-        .slots-container {
-            display: flex;
-            justify-content: space-between;
-            background: #000;
-            border: 2px solid #24A1DE;
-            border-radius: 20px;
-            height: 100px;
-            overflow: hidden;
-            margin-bottom: 25px;
-            box-shadow: 0 0 15px rgba(36, 161, 222, 0.2);
-        }
-
-        .reel {
-            width: 32%;
-            position: relative;
-        }
-
-        .reel-inner {
-            position: absolute;
-            width: 100%;
-            transition: transform 3s cubic-bezier(0.15, 0, 0.05, 1);
-        }
-
-        .symbol {
-            height: 100px;
-            line-height: 100px;
-            font-size: 50px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .balance-info {
-            display: flex;
-            justify-content: space-around;
-            background: rgba(0,0,0,0.2);
-            padding: 15px;
-            border-radius: 15px;
-            margin-bottom: 25px;
-        }
-
-        .val { font-size: 20px; font-weight: bold; color: #ffce31; }
+        .val { font-size: 22px; font-weight: bold; color: #ffce31; }
         .label { font-size: 10px; color: #888; display: block; }
 
+        .pay-btn {
+            background: #24A1DE; border: none; border-radius: 12px;
+            color: white; padding: 8px 15px; font-weight: bold;
+            font-size: 14px; cursor: pointer; display: flex; align-items: center; gap: 5px;
+        }
+
+        /* Слоты */
+        .slots-container {
+            display: flex; justify-content: space-between;
+            background: #000; border: 2px solid #24A1DE;
+            border-radius: 20px; height: 100px; overflow: hidden;
+            margin-bottom: 25px;
+        }
+
+        .reel { width: 32%; position: relative; }
+        .reel-inner { position: absolute; width: 100%; transition: transform 3s cubic-bezier(0.15, 0, 0.05, 1); }
+        .symbol { height: 100px; line-height: 100px; font-size: 50px; display: flex; align-items: center; justify-content: center; }
+
         .play-btn {
-            width: 100%;
-            padding: 20px;
-            background: #24A1DE;
-            border: none;
-            border-radius: 20px;
-            color: white;
-            font-size: 20px;
-            font-weight: bold;
-            cursor: pointer;
-            box-shadow: 0 5px 15px rgba(36, 161, 222, 0.3);
+            width: 100%; padding: 20px; background: #24A1DE;
+            border: none; border-radius: 20px; color: white;
+            font-size: 20px; font-weight: bold; cursor: pointer;
         }
 
         .play-btn:active { transform: scale(0.97); }
         .play-btn:disabled { background: #555; }
-
+        
         #msg { margin-top: 15px; color: #24A1DE; font-weight: bold; min-height: 20px; }
     </style>
 </head>
@@ -105,7 +65,15 @@
 
 <div class="app">
     <div class="header">
-        <h1>STAR GIFTS v3</h1>
+        <h1>STAR GIFTS PRO</h1>
+    </div>
+
+    <div class="balance-container">
+        <div style="text-align: left;">
+            <span class="label">БАЛАНС</span>
+            <span class="val" id="bal">5000</span> ⭐️
+        </div>
+        <button class="pay-btn" id="pay-btn">➕ КУПИТЬ</button>
     </div>
 
     <div class="slots-container">
@@ -114,13 +82,8 @@
         <div class="reel"><div id="r3" class="reel-inner"></div></div>
     </div>
 
-    <div class="balance-info">
-        <div><span class="label">БАЛАНС</span><span class="val" id="bal">5000</span> ⭐️</div>
-        <div><span class="label">СТАВКА</span><span class="val">10</span> ⭐️</div>
-    </div>
-
-    <button class="play-btn" id="btn">ИГРАТЬ</button>
-    <div id="msg">Удачи!</div>
+    <button class="play-btn" id="btn">ИГРАТЬ (10 ⭐️)</button>
+    <div id="msg">Нажми "Купить" для пополнения!</div>
 </div>
 
 <script>
@@ -131,6 +94,7 @@
     let balance = parseInt(localStorage.getItem('stars_v3')) || 5000;
     let spinning = false;
 
+    // Инициализация
     function createReels() {
         [1,2,3].forEach(id => {
             const el = document.getElementById('r'+id);
@@ -149,6 +113,22 @@
         localStorage.setItem('stars_v3', balance);
     }
 
+    // ЛОГИКА ОПЛАТЫ (PAY)
+    document.getElementById('pay-btn').onclick = () => {
+        tg.showConfirm("Хотите купить 1000 Stars за ⭐️50?", (confirmed) => {
+            if (confirmed) {
+                tg.showPopup({
+                    title: 'Успешная оплата!',
+                    message: 'Вы получили 1000 звезд на свой баланс.',
+                    buttons: [{type: 'ok'}]
+                });
+                balance += 1000;
+                update();
+                if(tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
+            }
+        });
+    };
+
     async function start() {
         if(spinning || balance < 10) return;
         spinning = true;
@@ -157,7 +137,7 @@
         
         const btn = document.getElementById('btn');
         btn.disabled = true;
-        document.getElementById('msg').innerText = "Удача близко...";
+        document.getElementById('msg').innerText = "Проверка удачи...";
 
         if(tg.HapticFeedback) tg.HapticFeedback.impactOccurred('medium');
 
@@ -169,7 +149,7 @@
             el.lastElementChild.innerText = res;
             
             const offset = (el.children.length - 1) * 100;
-            el.style.transition = `transform ${2 + id*0.5}s cubic-bezier(0.1, 0, 0.1, 1)`;
+            el.style.transition = `transform ${2 + id*0.5}s cubic-bezier(0.15, 0, 0.05, 1)`;
             el.style.transform = `translateY(-${offset}px)`;
         });
 
@@ -183,8 +163,9 @@
 
             if(final[0] === final[1] && final[1] === final[2]) {
                 balance += 500;
-                document.getElementById('msg').innerText = "ВЫИГРЫШ +500!";
+                document.getElementById('msg').innerText = "ДЖЕКПОТ +500!";
                 confetti({ particleCount: 150 });
+                if(tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
             } else {
                 document.getElementById('msg').innerText = "Попробуй еще раз";
             }
