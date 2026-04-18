@@ -3,36 +3,415 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>NEON SPIN V2</title>
+    <title>CYBERPUNK SLOT</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+        
+        :root {
+            --neon-pink: #ff00ff;
+            --neon-cyan: #00ffff;
+            --neon-green: #00ff9f;
+        }
+        
+        body {
+            background: #0a0a0a;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            font-family: 'Press Start 2P', system-ui;
+            color: white;
+        }
+        
+        .neon-text {
+            text-shadow: 
+                0 0 10px var(--neon-pink),
+                0 0 20px var(--neon-pink),
+                0 0 40px var(--neon-cyan);
+        }
+        
+        .neon-button {
+            transition: all 0.2s;
+            box-shadow: 
+                0 0 15px var(--neon-pink),
+                0 0 30px var(--neon-cyan);
+        }
+        
+        .neon-button:hover {
+            transform: scale(1.05);
+            box-shadow: 
+                0 0 25px var(--neon-pink),
+                0 0 50px var(--neon-cyan);
+        }
+        
+        #background-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1;
+            opacity: 0.15;
+        }
+        
+        .slot-container {
+            position: relative;
+            z-index: 10;
+            background: rgba(10, 10, 30, 0.95);
+            border: 6px solid #ff00ff;
+            box-shadow: 
+                0 0 40px #00ffff,
+                inset 0 0 60px rgba(0, 255, 255, 0.6);
+        }
+    </style>
 </head>
-<body>
+<body class="flex flex-col h-screen">
 
-<div class="bg"></div>
+    <!-- ФОНОВЫЙ CANVAS (цифровой дождь + glitch) -->
+    <canvas id="background-canvas" width="1200" height="800"></canvas>
 
-<div class="game">
-    <div class="top">
-        <h1>NEON SPIN V2</h1>
-        <div class="balance-container">
-            BALANCE: <span id="balance">0</span>
+    <div class="flex flex-col h-full max-w-2xl mx-auto w-full relative z-10 p-4">
+
+        <!-- HEADER (баланс + win) -->
+        <div class="flex justify-between items-center mb-4 bg-black/80 border-2 border-cyan-400 p-3 rounded-xl neon-text">
+            <div>
+                <div class="text-xs text-cyan-400 tracking-widest">BALANCE</div>
+                <div id="balance" class="text-3xl font-bold text-white">1240</div>
+            </div>
+            <div class="text-center">
+                <div class="text-xs text-pink-400 tracking-widest">WIN</div>
+                <div id="win" class="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-pink-400 to-cyan-400">0</div>
+            </div>
+            <div class="text-right">
+                <div class="text-xs text-cyan-400">BET</div>
+                <div id="bet" class="text-2xl font-bold">50</div>
+            </div>
+        </div>
+
+        <!-- СЛОТ (5x3 КАТУШКИ) -->
+        <div class="slot-container rounded-3xl p-4 shadow-2xl border-4 border-pink-500 flex-1 flex items-center justify-center relative">
+            <canvas id="reels-canvas" width="720" height="360" class="rounded-2xl"></canvas>
+            
+            <!-- Неоновые блики сверху -->
+            <div class="absolute top-0 left-0 right-0 h-8 bg-gradient-to-b from-cyan-400/30 to-transparent pointer-events-none"></div>
+            
+            <!-- Glitch overlay -->
+            <div id="glitch" class="absolute inset-0 pointer-events-none hidden"></div>
+        </div>
+
+        <!-- КНОПКИ УПРАВЛЕНИЯ -->
+        <div class="grid grid-cols-5 gap-3 mt-6">
+            <button onclick="changeBet(-10)" 
+                    class="neon-button bg-black border-4 border-cyan-400 text-cyan-400 py-4 rounded-2xl text-xl font-bold">−10</button>
+            
+            <button onclick="changeBet(10)" 
+                    class="neon-button bg-black border-4 border-cyan-400 text-cyan-400 py-4 rounded-2xl text-xl font-bold">+10</button>
+            
+            <button onclick="spin()" 
+                    id="spin-btn"
+                    class="neon-button col-span-3 bg-gradient-to-r from-pink-500 to-cyan-400 text-black py-6 rounded-3xl text-3xl font-bold tracking-widest shadow-inner">
+                SPIN
+            </button>
+            
+            <button onclick="maxBet()" 
+                    class="neon-button bg-black border-4 border-pink-500 text-pink-400 py-4 rounded-2xl text-xl font-bold">MAX</button>
+            
+            <button onclick="toggleAuto()" 
+                    id="auto-btn"
+                    class="neon-button bg-black border-4 border-pink-500 text-pink-400 py-4 rounded-2xl text-xl font-bold">AUTO</button>
+        </div>
+
+        <!-- Футер с Telegram-статусом -->
+        <div class="text-center text-xs text-cyan-400/50 mt-4 tracking-widest">
+            CYBERPUNK SLOT • v1.0 • MADE FOR TELEGRAM MINI APP
         </div>
     </div>
 
-    <div class="reels">
-        <div class="reel" id="r1"></div>
-        <div class="reel" id="r2"></div>
-        <div class="reel" id="r3"></div>
-    </div>
+<script>
+// ==================== TELEGRAM MINI APP INIT ====================
+const tg = window.Telegram.WebApp;
+tg.ready();
+tg.expand();
+tg.setHeaderColor('#000000');
+tg.setBackgroundColor('#0a0a0a');
 
-    <div id="win">READY TO SPIN?</div>
+// ==================== ПЕРЕМЕННЫЕ ИГРЫ ====================
+let balance = 1240;
+let bet = 50;
+let isSpinning = false;
+let autoPlay = false;
+let autoInterval = null;
 
-    <div class="controls">
-        <button onclick="spin()" id="spin">SPIN (50)</button>
-        <button onclick="daily()" class="secondary">DAILY BONUS</button>
-    </div>
-</div>
+const symbols = [
+    { emoji: '🪓', name: 'SAMURAI', color: '#ff00ff' },
+    { emoji: '💀', name: 'SKULL',   color: '#00ffff' },
+    { emoji: '7️⃣', name: '777',     color: '#00ff9f' },
+    { emoji: '⚔️', name: 'KATANA',  color: '#ff00ff' },
+    { emoji: '🔥', name: 'GLITCH',  color: '#ffff00' },
+    { emoji: '🤖', name: 'HACK',    color: '#00ff9f' }
+];
 
-<script src="script.js"></script>
+// 5 катушек × 3 видимых ряда
+let reels = [
+    [0, 1, 2],
+    [3, 4, 5],
+    [0, 2, 4],
+    [1, 3, 5],
+    [2, 4, 0]
+];
+
+// ==================== BACKGROUND DIGITAL RAIN ====================
+const bgCanvas = document.getElementById('background-canvas');
+const bgCtx = bgCanvas.getContext('2d');
+
+function resizeBg() {
+    bgCanvas.width = window.innerWidth;
+    bgCanvas.height = window.innerHeight;
+}
+window.addEventListener('resize', resizeBg);
+resizeBg();
+
+const rainDrops = [];
+for (let i = 0; i < 120; i++) {
+    rainDrops.push({
+        x: Math.random() * bgCanvas.width,
+        y: Math.random() * bgCanvas.height,
+        speed: Math.random() * 8 + 4,
+        char: ['0','1','7','█','▓','▒'][Math.floor(Math.random()*6)]
+    });
+}
+
+function drawRain() {
+    bgCtx.fillStyle = 'rgba(10,10,40,0.1)';
+    bgCtx.fillRect(0, 0, bgCanvas.width, bgCanvas.height);
+    
+    bgCtx.font = '18px monospace';
+    rainDrops.forEach(drop => {
+        const hue = Math.random() * 30 + 170; // cyan-pink
+        bgCtx.fillStyle = `hsl(${hue}, 100%, 70%)`;
+        bgCtx.fillText(drop.char, drop.x, drop.y);
+        
+        drop.y += drop.speed;
+        if (drop.y > bgCanvas.height) {
+            drop.y = -20;
+            drop.x = Math.random() * bgCanvas.width;
+        }
+    });
+    
+    // случайный glitch
+    if (Math.random() < 0.03) {
+        bgCtx.fillStyle = 'rgba(255,0,255,0.15)';
+        bgCtx.fillRect(0, Math.random()*bgCanvas.height, bgCanvas.width, 8);
+    }
+}
+setInterval(drawRain, 1000/60);
+
+// ==================== РЕАЛЬНЫЕ КАТУШКИ (Canvas) ====================
+const canvas = document.getElementById('reels-canvas');
+const ctx = canvas.getContext('2d');
+
+const REEL_WIDTH = 130;
+const REEL_HEIGHT = 110;
+const GAP = 18;
+
+function drawReels() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+    // тёмный фон катушек
+    ctx.fillStyle = '#111122';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    
+    // рамка неона
+    ctx.shadowColor = '#00ffff';
+    ctx.shadowBlur = 25;
+    ctx.strokeStyle = '#ff00ff';
+    ctx.lineWidth = 12;
+    ctx.strokeRect(10, 10, canvas.width-20, canvas.height-20);
+    ctx.shadowBlur = 0;
+    
+    for (let reel = 0; reel < 5; reel++) {
+        const x = reel * (REEL_WIDTH + GAP) + 28;
+        
+        for (let row = 0; row < 3; row++) {
+            const y = row * REEL_HEIGHT + 20;
+            const symIndex = reels[reel][row];
+            const sym = symbols[symIndex];
+            
+            // символ
+            ctx.shadowColor = sym.color;
+            ctx.shadowBlur = 35;
+            ctx.font = 'bold 68px monospace';
+            ctx.fillStyle = sym.color;
+            ctx.textAlign = 'center';
+            ctx.fillText(sym.emoji, x + REEL_WIDTH/2, y + REEL_HEIGHT/1.4);
+            
+            // название под символом
+            ctx.shadowBlur = 10;
+            ctx.font = '12px "Press Start 2P"';
+            ctx.fillStyle = '#ffffff';
+            ctx.fillText(sym.name, x + REEL_WIDTH/2, y + REEL_HEIGHT - 12);
+        }
+    }
+    
+    // горизонтальные неоновые линии
+    ctx.shadowBlur = 15;
+    ctx.strokeStyle = '#00ffff';
+    ctx.lineWidth = 4;
+    ctx.beginPath();
+    ctx.moveTo(20, 130);
+    ctx.lineTo(canvas.width-20, 130);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(20, 250);
+    ctx.lineTo(canvas.width-20, 250);
+    ctx.stroke();
+}
+
+// ==================== АНИМАЦИЯ СПИНА ====================
+let spinAnimationFrame = null;
+let spinVelocities = [0,0,0,0,0]; // скорость каждой катушки
+
+function startSpin() {
+    if (isSpinning) return;
+    if (balance < bet) {
+        tg.showAlert("НЕДОСТАТОЧНО КРЕДИТОВ!");
+        return;
+    }
+    
+    isSpinning = true;
+    balance -= bet;
+    document.getElementById('balance').textContent = balance;
+    document.getElementById('win').textContent = '0';
+    document.getElementById('spin-btn').style.opacity = '0.4';
+    
+    // случайные скорости
+    spinVelocities = [
+        28 + Math.random()*8,
+        32 + Math.random()*8,
+        26 + Math.random()*8,
+        30 + Math.random()*8,
+        29 + Math.random()*8
+    ];
+    
+    // случайные новые символы
+    for (let i = 0; i < 5; i++) {
+        reels[i] = [
+            Math.floor(Math.random()*symbols.length),
+            Math.floor(Math.random()*symbols.length),
+            Math.floor(Math.random()*symbols.length)
+        ];
+    }
+    
+    animateSpin();
+}
+
+function animateSpin() {
+    let stillSpinning = false;
+    
+    for (let i = 0; i < 5; i++) {
+        if (spinVelocities[i] > 0) {
+            stillSpinning = true;
+            
+            // сдвигаем символы вниз
+            reels[i].unshift(reels[i].pop());
+            
+            // замедляем
+            spinVelocities[i] *= 0.94;
+            
+            // последняя катушка останавливается чуть позже
+            if (i === 4 && spinVelocities[i] < 2) spinVelocities[i] = 0;
+        }
+    }
+    
+    drawReels();
+    
+    if (stillSpinning) {
+        spinAnimationFrame = requestAnimationFrame(animateSpin);
+    } else {
+        finishSpin();
+    }
+}
+
+function finishSpin() {
+    isSpinning = false;
+    cancelAnimationFrame(spinAnimationFrame);
+    document.getElementById('spin-btn').style.opacity = '1';
+    
+    // проверка выигрыша (простая: 3 одинаковых в среднем ряду)
+    const middleRow = reels.map(r => r[1]);
+    const winAmount = calculateWin(middleRow);
+    
+    if (winAmount > 0) {
+        balance += winAmount;
+        document.getElementById('win').innerHTML = `+<span class="text-green-400">${winAmount}</span>`;
+        
+        // GLITCH ЭФФЕКТ при выигрыше
+        const glitchDiv = document.getElementById('glitch');
+        glitchDiv.classList.remove('hidden');
+        glitchDiv.style.background = 'linear-gradient(90deg, transparent 50%, rgba(255,0,255,0.3) 50%)';
+        glitchDiv.style.backgroundSize = '8px 100%';
+        setTimeout(() => { glitchDiv.classList.add('hidden'); }, 800);
+        
+        tg.HapticFeedback.impactOccurred('heavy');
+    }
+    
+    document.getElementById('balance').textContent = balance;
+    
+    // автоигра
+    if (autoPlay && balance >= bet) {
+        autoInterval = setTimeout(() => startSpin(), 1200);
+    }
+}
+
+function calculateWin(row) {
+    // 3 одинаковых = x15
+    if (row[0] === row[1] && row[1] === row[2]) {
+        return bet * 15;
+    }
+    // 2 одинаковых = x3
+    if (row[0] === row[1] || row[1] === row[2]) {
+        return bet * 3;
+    }
+    return 0;
+}
+
+// ==================== КНОПКИ ====================
+function spin() {
+    startSpin();
+}
+
+function changeBet(delta) {
+    if (isSpinning) return;
+    bet = Math.max(10, Math.min(500, bet + delta));
+    document.getElementById('bet').textContent = bet;
+}
+
+function maxBet() {
+    if (isSpinning) return;
+    bet = 500;
+    document.getElementById('bet').textContent = bet;
+}
+
+function toggleAuto() {
+    autoPlay = !autoPlay;
+    const btn = document.getElementById('auto-btn');
+    btn.style.backgroundColor = autoPlay ? '#22ff88' : 'black';
+    btn.style.color = autoPlay ? 'black' : '#ff00ff';
+    
+    if (!autoPlay && autoInterval) {
+        clearTimeout(autoInterval);
+    }
+}
+
+// ==================== ЗАПУСК ====================
+window.onload = () => {
+    drawReels();
+    tg.MainButton.setText('ИГРАТЬ В CYBERPUNK SLOT');
+    tg.MainButton.show();
+    tg.MainButton.onClick(() => startSpin());
+    
+    // приветствие
+    console.log('%cCYBERPUNK SLOT MINI APP ЗАГРУЖЕН', 'color:#00ffff; font-size:18px; font-family:monospace');
+};
+</script>
 </body>
 </html>
