@@ -1,110 +1,93 @@
+// Инициализация Telegram
 const tg = window.Telegram.WebApp;
 tg.ready();
 tg.expand();
-tg.setBackgroundColor('#0a0a0f');
 
-let balance = 2500;
-let combo = 0;
-let level = 1;
+let balance = 1000;
 
-const symbols = ['🍒','🍉','🍋','⭐','7️⃣','🔥','⚡'];
+const symbols = [
+    { s: "🍒", w: 40 },
+    { s: "🍋", w: 30 },
+    { s: "🍉", w: 20 },
+    { s: "⭐", w: 8 },
+    { s: "💎", w: 2 } // Шанс выпадения джекпота
+];
 
-function initReels() {
-    document.querySelectorAll('.reel-inner').forEach(reel => {
-        let html = '';
-        for (let i = 0; i < 25; i++) {
-            html += `<div class="symbol">${symbols[Math.floor(Math.random()*symbols.length)]}</div>`;
-        }
-        reel.innerHTML = html;
+// Функция случайного выбора символа с весами
+function getSymbol() {
+    let pool = [];
+    symbols.forEach(sym => {
+        for (let i = 0; i < sym.w; i++) pool.push(sym.s);
     });
+    return pool[Math.floor(Math.random() * pool.length)];
 }
 
+// Обновление экрана
+function render() {
+    document.getElementById("balance").innerText = balance;
+}
+
+// Основная функция спина
 function spin() {
-    const cost = 100;
-    if (balance < cost) {
-        showWin("Недостаточно монет!", "#ff0066");
+    if (balance < 50) {
+        show("NO MONEY");
+        tg.HapticFeedback.notificationOccurred('error');
         return;
     }
 
-    balance -= cost;
-    updateBalance();
+    balance -= 50;
+    render();
+    
+    // Вибрация при нажатии
+    tg.HapticFeedback.impactOccurred('medium');
 
-    // Анимация спина (упрощённая, но эффектная)
-    document.querySelectorAll('.reel-inner').forEach((reel, i) => {
-        const delay = i * 300;
-        reel.style.transition = `transform ${2.2 + i*0.4}s cubic-bezier(0.25, 0.1, 0.25, 1)`;
-        reel.style.transform = `translateY(-${1500 + Math.random()*600}px)`;
-    });
+    // Генерируем символы
+    let r1 = getSymbol();
+    let r2 = getSymbol();
+    let r3 = getSymbol();
 
-    setTimeout(() => {
-        // Финальные символы
-        const res = [symbols[Math.floor(Math.random()*symbols.length)], 
-                     symbols[Math.floor(Math.random()*symbols.length)], 
-                     symbols[Math.floor(Math.random()*symbols.length)]];
+    // Отрисовываем результат
+    document.getElementById("r1").innerHTML = `<div class='symbol'>${r1}</div>`;
+    document.getElementById("r2").innerHTML = `<div class='symbol'>${r2}</div>`;
+    document.getElementById("r3").innerHTML = `<div class='symbol'>${r3}</div>`;
 
-        document.getElementById('reel1').innerHTML = `<div class="symbol" style="font-size:62px">${res[0]}</div>`;
-        document.getElementById('reel2').innerHTML = `<div class="symbol" style="font-size:62px">${res[1]}</div>`;
-        document.getElementById('reel3').innerHTML = `<div class="symbol" style="font-size:62px">${res[2]}</div>`;
+    // Проверка победы
+    if (r1 === r2 && r2 === r3) {
+        let winAmount = 500;
+        if (r1 === "💎") winAmount = 5000;
 
-        if (res[0] === res[1] && res[1] === res[2]) {
-            const win = cost * 15;
-            balance += win;
-            combo++;
-            showWin(`JACKPOT! +${win}`, "#ffff00");
-            tg.HapticFeedback.impactOccurred("heavy");
-        } else {
-            combo = Math.max(0, combo - 1);
-            showWin("Попробуй ещё раз", "#888");
-        }
-        updateBalance();
-    }, 2800);
-}
-
-function showWin(text, color) {
-    const msg = document.getElementById('win-message');
-    msg.textContent = text;
-    msg.style.color = color;
-    setTimeout(() => msg.textContent = '', 3000);
-}
-
-function updateBalance() {
-    document.getElementById('balance').textContent = balance;
-    document.getElementById('combo').textContent = combo;
-}
-
-// Telegram Stars покупка
-document.getElementById('buy-btn').addEventListener('click', () => {
-    tg.openInvoice({
-        title: "Neon Pack",
-        description: "5000 монет + бонус",
-        payload: "neon_pack_5000",
-        currency: "XTR",
-        prices: [{label: "5000 монет", amount: 350}]
-    });
-});
-
-tg.onEvent('invoiceClosed', (e) => {
-    if (e.status === 'paid') {
-        balance += 5000;
-        updateBalance();
-        showWin("Покупка прошла! +5000", "#00ff9d");
+        balance += winAmount;
+        show("WIN +" + winAmount);
+        
+        // Эффект победы
+        tg.HapticFeedback.notificationOccurred('success');
+        explode();
+    } else {
+        show("TRY AGAIN");
     }
-});
+    
+    render();
+}
 
-document.getElementById('spin-btn').addEventListener('click', spin);
-document.getElementById('reward-btn').addEventListener('click', () => {
-    // Здесь позже подключишь реальную рекламу
-    showWin("Смотрим рекламу...", "#00ffff");
+function show(t) {
+    document.getElementById("win").innerText = t;
+}
+
+// Простой эффект вспышки при выигрыше
+function explode() {
+    document.body.style.background = "#ff00ff44";
     setTimeout(() => {
-        balance += 250;
-        updateBalance();
-        showWin("+250 монет за просмотр!", "#00ff9d");
-    }, 1200);
-});
+        document.body.style.background = "#05010a";
+    }, 300);
+}
 
-// Запуск
-initReels();
-updateBalance();
-document.getElementById('user-info').innerHTML = `Привет, ${tg.initDataUnsafe.user?.first_name || 'Neon Hunter'}!`;
+// Бонусная кнопка
+function daily() {
+    balance += 300;
+    tg.HapticFeedback.notificationOccurred('success');
+    render();
+    show("DAILY +300");
+}
 
-console.log('%cNEON SPIN — трендовый Telegram Mini App 2026 готов!', 'color:#00ff9d; font-size:16px');
+// Первый запуск
+render();
