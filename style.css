@@ -1,132 +1,69 @@
-:root {
-    --neon-pink: #ff00ff;
-    --neon-blue: #00ffff;
-    --neon-gold: #ffcc00;
-}
-
 body {
-    margin: 0;
-    padding: 0;
-    background: #000;
-    color: white;
-    font-family: 'Courier New', Courier, monospace; /* Более "компьютерный" шрифт */
-    overflow: hidden;
-    user-select: none;
+margin:0;
+background:#05010a;
+color:white;
+font-family:Arial;
+overflow:hidden;
 }
 
-/* Главный контейнер */
-.cyber-container {
-    position: relative;
-    width: 100%;
-    height: 100vh; /* На весь экран */
-    display: flex;
-    justify-content: center;
-    align-items: center;
+.bg {
+position:absolute;
+width:100%;
+height:100%;
+background: radial-gradient(circle, #ff00ff22, #000);
+filter: blur(60px);
 }
 
-/* Сам корпус автомата - твой новый референс в качестве фона */
-.machine-body {
-    position: relative;
-    width: 100%;
-    height: 100%;
-    max-width: 450px; /* Ограничиваем ширину для мобильных */
-    margin: 0 auto;
-    background: url('cyberpunk_bg.png') no-repeat center center;
-    background-size: cover; /* Чтобы фон заполнил всю высоту */
-    display: flex;
-    flex-direction: column;
+.game {
+position:relative;
+text-align:center;
+padding-top:50px;
 }
 
-/* Контейнер для барабанов - ПОЗИЦИОНИРУЕМ ТОЧНО НА МЕСТО СЕМЕРОК НА КАРТИНКЕ */
 .reels {
-    position: absolute;
-    top: 36%; /* Тюнингуем положение, чтобы попасть на дисплеи картинки */
-    left: 50%;
-    transform: translateX(-50%);
-    display: flex;
-    justify-content: center;
-    gap: 1.5%; /* Регулируем зазор, чтобы совпало с референсом */
-    width: 80%;
-    height: 25vh; /* Высота зоны барабанов */
+display:flex;
+justify-content:center;
+gap:10px;
+margin:40px;
 }
 
 .reel {
-    width: 19%; /* Тюнингуем ширину (для 5 барабанов) */
-    height: 100%;
-    background: transparent; /* Оставляем фон картинки видимым */
-    border: none;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column; /* Символы будут идти вертикально */
-    align-items: center;
-    justify-content: space-around; /* Равномерное распределение */
+width:90px;
+height:120px;
+background:rgba(255,255,255,0.05);
+border:1px solid #ff00ff;
+border-radius:10px;
+overflow:hidden;
+box-shadow:0 0 20px #ff00ff;
 }
 
-/* Твой символ - делаем его похожим по цвету и размеру на референс */
 .symbol {
-    font-size: 30px; /* Уменьшаем, чтобы влезли в 5 барабанов */
-    color: var(--neon-pink); /* По умолчанию неоновый малиновый */
-    text-shadow: 0 0 10px var(--neon-pink), 0 0 20px var(--neon-pink);
-    animation: pop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+font-size:40px;
+height:40px;
+display:flex;
+align-items:center;
+justify-content:center;
+animation:pop .3s ease;
 }
 
-/* Улучшаем анимацию появления */
 @keyframes pop {
-    from { transform: scale(0.3); opacity: 0; }
-    to { transform: scale(1); opacity: 1; }
-}
-
-/* Баланс - позиционируем его на дисплей с цифрами '1,234' */
-.balance-display {
-    position: absolute;
-    bottom: 12.5%; /* Тюнингуем положение, чтобы попасть на дисплей 'Balance' */
-    left: 50%;
-    transform: translateX(-50%);
-    font-size: 24px;
-    font-weight: bold;
-    color: var(--neon-blue); /* На референсе цифры баланса синие/золотые */
-    text-shadow: 0 0 10px var(--neon-blue);
-    letter-spacing: 2px;
-}
-
-/* Невидимые контроллеры - накладываем кнопки поверх панели */
-.invisible-controls {
-    position: absolute;
-    bottom: 3%; /* Тюнингуем положение, чтобы попасть на панель */
-    left: 50%;
-    transform: translateX(-50%);
-    display: flex;
-    justify-content: center;
-    gap: 10px;
-    width: 80%;
+from {transform:scale(0.5);opacity:0}
+to {transform:scale(1);opacity:1}
 }
 
 button {
-    background: transparent; /* Делаем невидимыми */
-    border: none;
-    cursor: pointer;
+margin:10px;
+padding:15px;
+border:none;
+border-radius:10px;
+background:#ff00ff;
+color:white;
+font-weight:bold;
+box-shadow:0 0 20px #ff00ff;
 }
 
-/* Кнопка SPIN (накладываем поверх нарисованной кнопки 'SPIN') */
-.inv-spin {
-    width: 120px;
-    height: 50px;
-}
-
-/* Кнопка AUTO (накладываем поверх нарисованной кнопки 'AUTO') */
-.inv-auto {
-    width: 70px;
-    height: 50px;
-}
-
-/* Статус-дисплей вверху экрана */
-#win-status {
-    position: fixed;
-    top: 5px;
-    left: 0;
-    width: 100%;
-    text-align: center;
-    font-size: 14px;
-    color: var(--neon-gold);
-    text-transform: uppercase;
+#win {
+font-size:20px;
+margin:10px;
+text-shadow:0 0 10px #00ffcc;
 }
