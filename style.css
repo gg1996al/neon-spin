@@ -1,106 +1,132 @@
-@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
-
 :root {
-    --tg-theme-bg-color: #0a0a0f;
-    --tg-theme-text-color: #ffffff;
-    --tg-theme-button-color: #00ff9d;
+    --neon-pink: #ff00ff;
+    --neon-blue: #00ffff;
+    --neon-gold: #ffcc00;
 }
 
 body {
     margin: 0;
     padding: 0;
-    background: var(--tg-theme-bg-color);
-    color: var(--tg-theme-text-color);
-    font-family: 'Press Start 2P', system-ui;
+    background: #000;
+    color: white;
+    font-family: 'Courier New', Courier, monospace; /* Более "компьютерный" шрифт */
     overflow: hidden;
-    height: 100vh;
+    user-select: none;
 }
 
-.container {
-    max-width: 480px;
-    margin: 0 auto;
-    padding: 15px;
+/* Главный контейнер */
+.cyber-container {
+    position: relative;
+    width: 100%;
+    height: 100vh; /* На весь экран */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Сам корпус автомата - твой новый референс в качестве фона */
+.machine-body {
+    position: relative;
+    width: 100%;
     height: 100%;
+    max-width: 450px; /* Ограничиваем ширину для мобильных */
+    margin: 0 auto;
+    background: url('cyberpunk_bg.png') no-repeat center center;
+    background-size: cover; /* Чтобы фон заполнил всю высоту */
     display: flex;
     flex-direction: column;
 }
 
-.header h1 {
-    font-size: 32px;
-    text-align: center;
-    margin: 10px 0;
-    text-shadow: 0 0 20px #00ff9d, 0 0 40px #ff00ff;
-    letter-spacing: 4px;
-}
-
-.glow { color: #ff00ff; animation: neon-flicker 1.2s infinite alternate; }
-
-@keyframes neon-flicker {
-    0% { opacity: 0.9; text-shadow: 0 0 10px #ff00ff; }
-    100% { opacity: 1; text-shadow: 0 0 30px #ff00ff, 0 0 50px #00ff9d; }
-}
-
-.display-frame {
-    background: #111118;
-    border: 6px solid #00ff9d;
-    border-radius: 16px;
-    padding: 12px;
-    box-shadow: 0 0 30px #00ff9d, inset 0 0 20px #000;
-    margin: 15px 0;
-}
-
+/* Контейнер для барабанов - ПОЗИЦИОНИРУЕМ ТОЧНО НА МЕСТО СЕМЕРОК НА КАРТИНКЕ */
 .reels {
+    position: absolute;
+    top: 36%; /* Тюнингуем положение, чтобы попасть на дисплеи картинки */
+    left: 50%;
+    transform: translateX(-50%);
     display: flex;
-    gap: 10px;
     justify-content: center;
+    gap: 1.5%; /* Регулируем зазор, чтобы совпало с референсом */
+    width: 80%;
+    height: 25vh; /* Высота зоны барабанов */
 }
 
 .reel {
-    width: 110px;
-    height: 160px;
-    background: #1a1a22;
-    border: 4px solid #ff00ff;
-    border-radius: 12px;
-    overflow: hidden;
-    box-shadow: 0 0 15px #ff00ff;
-}
-
-.symbol {
-    height: 53px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 48px;
-    background: linear-gradient(#222, #111);
-    border-bottom: 2px solid #333;
-}
-
-.main-btn {
-    background: linear-gradient(#00ff9d, #00cc7a);
-    color: #000;
-    font-size: 22px;
-    padding: 18px;
+    width: 19%; /* Тюнингуем ширину (для 5 барабанов) */
+    height: 100%;
+    background: transparent; /* Оставляем фон картинки видимым */
     border: none;
-    border-radius: 12px;
-    width: 100%;
-    margin: 10px 0;
-    box-shadow: 0 0 20px #00ff9d;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column; /* Символы будут идти вертикально */
+    align-items: center;
+    justify-content: space-around; /* Равномерное распределение */
+}
+
+/* Твой символ - делаем его похожим по цвету и размеру на референс */
+.symbol {
+    font-size: 30px; /* Уменьшаем, чтобы влезли в 5 барабанов */
+    color: var(--neon-pink); /* По умолчанию неоновый малиновый */
+    text-shadow: 0 0 10px var(--neon-pink), 0 0 20px var(--neon-pink);
+    animation: pop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* Улучшаем анимацию появления */
+@keyframes pop {
+    from { transform: scale(0.3); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+/* Баланс - позиционируем его на дисплей с цифрами '1,234' */
+.balance-display {
+    position: absolute;
+    bottom: 12.5%; /* Тюнингуем положение, чтобы попасть на дисплей 'Balance' */
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 24px;
+    font-weight: bold;
+    color: var(--neon-blue); /* На референсе цифры баланса синие/золотые */
+    text-shadow: 0 0 10px var(--neon-blue);
+    letter-spacing: 2px;
+}
+
+/* Невидимые контроллеры - накладываем кнопки поверх панели */
+.invisible-controls {
+    position: absolute;
+    bottom: 3%; /* Тюнингуем положение, чтобы попасть на панель */
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    width: 80%;
+}
+
+button {
+    background: transparent; /* Делаем невидимыми */
+    border: none;
     cursor: pointer;
 }
 
-.reward-btn {
-    background: #6b00ff;
-    color: white;
-    padding: 12px;
-    border-radius: 12px;
-    border: none;
+/* Кнопка SPIN (накладываем поверх нарисованной кнопки 'SPIN') */
+.inv-spin {
+    width: 120px;
+    height: 50px;
+}
+
+/* Кнопка AUTO (накладываем поверх нарисованной кнопки 'AUTO') */
+.inv-auto {
+    width: 70px;
+    height: 50px;
+}
+
+/* Статус-дисплей вверху экрана */
+#win-status {
+    position: fixed;
+    top: 5px;
+    left: 0;
     width: 100%;
+    text-align: center;
+    font-size: 14px;
+    color: var(--neon-gold);
+    text-transform: uppercase;
 }
-
-.stars-btn {
-    background: #ffd700;
-    color: #000;
-    margin-top: 10px;
-}
-
-.neon-text { text-shadow: 0 0 15px #00ff9d; }
